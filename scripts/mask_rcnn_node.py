@@ -102,6 +102,23 @@ class MaskRCNNNode(object):
 
                 # Run detection
                 results = self._model.detect([np_image], verbose=0)
+
+                #DEBUG
+                log = ""
+                dir = "/home/frederik/mrcnn_log.txt"
+                log+= "results \n"
+                log+= str(results[0]["rois"]) + "\n"
+                log+= "results2" + "\n"
+                log += str(results[0]["class_ids"]) + "\n"
+                log += "results3 \n"
+                log += str(results[0]["scores"]) + "\n"
+                log += "results4 \n"
+                log += str(results[0]["masks"])
+
+                f = open(dir, "w")
+                f.writelines(log)
+                f.close()
+
                 result = results[0]
                 result_msg = self._build_result_msg(msg, result)
                 self._result_pub.publish(result_msg)
@@ -119,10 +136,10 @@ class MaskRCNNNode(object):
         result_msg.header = msg.header
         for i, (y1, x1, y2, x2) in enumerate(result['rois']):
             box = RegionOfInterest()
-            box.x_offset = np.asscalar(x1)
-            box.y_offset = np.asscalar(y1)
-            box.height = np.asscalar(y2 - y1)
-            box.width = np.asscalar(x2 - x1)
+            box.x_offset = x1.item() #np.asscalar(x1)
+            box.y_offset = y1.item() #np.asscalar(y1)
+            box.height = (y2 - y1).item() #np.asscalar(y2 - y1)
+            box.width = (x2 - x1).item() #np.asscalar(x2 - x1)
             result_msg.boxes.append(box)
 
             class_id = result['class_ids'][i]
